@@ -11,10 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.adobe.hackathon.model.dto.DetailedAnalysisResponse;
+import com.adobe.hackathon.model.dto.ExtractedSection;
+import com.adobe.hackathon.model.dto.SubsectionAnalysis;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -84,14 +87,17 @@ public class DocumentAnalysisService {
             jobRepository.save(job);
 
             // Step 3: Combine results
-            Map<String, Object> finalResult = new HashMap<>();
-            finalResult.put("pdfAnalysis", pdfAnalysis);
-            finalResult.put("semanticAnalysis", semanticAnalysis);
-            finalResult.put("jobId", jobId);
-            finalResult.put("persona", job.getPersona());
-            finalResult.put("jobToBeDone", job.getJobToBeDone());
+            DetailedAnalysisResponse detailedResponse = createDetailedResponse(
+                    pdfAnalysis, job.getFilePaths(), job.getPersona(), job.getJobToBeDone());
 
-            // Save final results
+// Combine with existing analysis
+            Map<String, Object> finalResult = new HashMap<>();
+            finalResult.put("data", detailedResponse);
+            finalResult.put("semanticAnalysis", semanticAnalysis);
+            finalResult.put("pdfAnalysis", pdfAnalysis);
+            finalResult.put("success", true);
+
+// Save final results
             String resultJson = objectMapper.writeValueAsString(finalResult);
             job.setResult(resultJson);
             job.setStatus("COMPLETED");
@@ -149,5 +155,51 @@ public class DocumentAnalysisService {
         } else {
             throw new RuntimeException("Cannot cancel job in status: " + job.getStatus());
         }
+    }
+    @Autowired
+    private SectionExtractionService sectionExtractionService;
+
+    // Add this method to your existing DocumentAnalysisService class
+    private DetailedAnalysisResponse createDetailedResponse(Map<String, Object> pdfAnalysis,
+                                                            String jobDirectory,
+                                                            String persona,
+                                                            String jobToBeDone) {
+        DetailedAnalysisResponse detailedResponse = new DetailedAnalysisResponse();
+
+        // Create metadata
+        List<String> documentNames = extractDocumentNames(pdfAnalysis);
+        DetailedAnalysisResponse.Metadata metadata = new DetailedAnalysisResponse.Metadata(
+                documentNames, persona, jobToBeDone
+        );
+        detailedResponse.setMetadata(metadata);
+
+        // Extract sections with importance ranking
+        List<ExtractedSection> extractedSections = sectionExtractionService
+                .extractSectionsFromDocuments(jobDirectory, persona, jobToBeDone);
+        detailedResponse.setExtractedSections(extractedSections);
+
+        // Extract subsection analysis
+        List<SubsectionAnalysis> subsectionAnalysis = sectionExtractionService
+                .extractSubsectionAnalysis(jobDirectory, extractedSections.stream().limit(10).collect(Collectors.toList()));
+        detailedResponse.setSubsectionAnalysis(subsectionAnalysis);
+
+        return detailedResponse;
+    }
+
+    // Add this helper method to your existing DocumentAnalysisService class
+    @SuppressWarnings("unchecked")
+    private List<String> extractDocumentNames(Map<String, Object> pdfAnalysis) {
+        List<String> documentNames = new ArrayList<>();
+
+        if (pdfAnalysis.containsKey("files")) {
+            List<Map<String, Object>> files = (List<Map<String, Object>>) pdfAnalysis.get("files");
+            for (Map<String, Object> file : files) {
+                if (file.containsKey("filename")) {
+                    documentNames.add(file.get("filename").toString());
+                }
+            }
+        }
+
+        return documentNames;
     }
 }
