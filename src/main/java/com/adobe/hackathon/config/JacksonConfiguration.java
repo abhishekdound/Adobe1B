@@ -40,3 +40,4 @@ public class JacksonConfiguration {
         return objectMapper;
     }
 }
+

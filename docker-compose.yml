@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  adobe-challenge-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - LLM_PROVIDER=gemini
+      - GEMINI_MODEL=gemini-2.5-flash
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/creds/google-creds.json
+      - AZURE_TTS_KEY=${AZURE_TTS_KEY}
+      - AZURE_TTS_ENDPOINT=${AZURE_TTS_ENDPOINT}
+      - TTS_PROVIDER=azure
+      - DATABASE_URL=jdbc:h2:mem:adobe_hackathon
+    volumes:
+      - ./uploads:/app/uploads
+      - ./creds:/app/creds:ro
+    networks:
+      - adobe-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/analysis/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: PostgreSQL for production use
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: adobe_hackathon
+      POSTGRES_USER: adobe_user
+      POSTGRES_PASSWORD: adobe_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - adobe-network
+    restart: unless-stopped
+    profiles:
+      - production
+
+  # Optional: Redis for caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - adobe-network
+    restart: unless-stopped
+    profiles:
+      - production
+
+  # Optional: Nginx for load balancing
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - adobe-challenge-app
+    networks:
+      - adobe-network
+    restart: unless-stopped
+    profiles:
+      - production
+
+networks:
+  adobe-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

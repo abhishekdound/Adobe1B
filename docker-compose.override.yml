@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  adobe-challenge-app:
+    environment:
+      - SPRING_PROFILES_ACTIVE=development
+      - SPRING_DEVTOOLS_RESTART_ENABLED=true
+      - LOGGING_LEVEL_COM_ADOBE_HACKATHON=DEBUG
+    volumes:
+      - ./src:/app/src
+      - ./target:/app/target
+    ports:
+      - "8080:8080"
+      - "5005:5005" # Debug port
+    command: >
+      java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      -jar target/Adobe1B.jar

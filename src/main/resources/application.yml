@@ -34,6 +34,26 @@ app:
       max-sections-per-document: 5
       confidence-threshold: 0.7
       detailed-analysis: true
+  pdf:
+    processing:
+      timeout: 300000
+    max-pages: 500
+
+    cors:
+      allowed-origins: "http://localhost:3000,http://localhost:8080"
+      allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
+      allowed-headers: "*"
+
+llm:
+  provider: gemini
+  model: gemini-2.5-flash
+  api:
+    timeout: 30000
+
+adobe:
+  pdf:
+    client-id: "${ADOBE_CLIENT_ID:}"
+    client-secret: "${ADOBE_CLIENT_SECRET:}"
 
 logging:
   level:
