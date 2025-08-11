@@ -1,0 +1,23 @@
+{
+    "challenge_info": {
+        "challenge_id": "round_1b_003",
+        "test_case_name": "create_manageable_forms",
+        "description": "Creating manageable forms"
+    },
+    "documents": [
+        {
+            "filename": "file02.pdf",
+            "title": ""
+        },
+        {
+            "filename": "Learn Acrobat - Create and Convert_2.pdf",
+            "title": "Learn Acrobat - Create and Convert_2"
+        }
+    ],
+    "persona": {
+        "role": "job search"
+    },
+    "job_to_be_done": {
+        "task": "find job"
+    }
+}

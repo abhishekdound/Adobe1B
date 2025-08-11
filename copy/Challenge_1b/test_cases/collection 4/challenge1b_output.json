@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "test_cases_documents": [
+      "file02.pdf",
+      "Learn Acrobat - Create and Convert_2.pdf"
+    ],
+    "persona": "job search",
+    "job_to_be_done": "find job"
+  },
+  "extracted_sections": [
+    {
+      "document": "file02.pdf",
+      "section_title": "Manifesto.",
+      "importance_rank": 1,
+      "page_number": 10
+    },
+    {
+      "document": "file02.pdf",
+      "section_title": "Chapter 1: Agile Software Development",
+      "importance_rank": 2,
+      "page_number": 10
+    },
+    {
+      "document": "file02.pdf",
+      "section_title": "2.2 Career Paths for Testers 7",
+      "importance_rank": 3,
+      "page_number": 4
+    },
+    {
+      "document": "file02.pdf",
+      "section_title": "2.2 Career Paths for Testers",
+      "importance_rank": 4,
+      "page_number": 7
+    },
+    {
+      "document": "file02.pdf",
+      "section_title": "4. Professionals who are experienced in their role (including unit testing) and need more",
+      "importance_rank": 5,
+      "page_number": 7
+    }
+  ],
+  "subsection_analysis": [
+    {
+      "document": "file02.pdf",
+      "refined_text": " The tester should understand the advantages of the whole-team approach and the benefits of",
+      "page_number": 10
+    },
+    {
+      "document": "file02.pdf",
+      "refined_text": " The tester should remember the basic concept of Agile software development based on the Agile",
+      "page_number": 10
+    },
+    {
+      "document": "file02.pdf",
+      "refined_text": "2.3 Learning Objectives 7",
+      "page_number": 4
+    },
+    {
+      "document": "file02.pdf",
+      "refined_text": "Building on the Foundation Level, the Agile Tester Extension supports the definition of career paths for",
+      "page_number": 7
+    },
+    {
+      "document": "file02.pdf",
+      "refined_text": "understanding and knowledge about how to perform and manage testing on all levels in Agile projects.",
+      "page_number": 7
+    }
+  ]
+}

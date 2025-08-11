@@ -1,24 +1,20 @@
 spring:
   application:
     name: adobe-challenge-1b
-
   datasource:
     url: jdbc:h2:file:./data/hackathon
     driver-class-name: org.h2.Driver
     username: sa
     password: password
-
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false  # Changed to false for production
     database-platform: org.hibernate.dialect.H2Dialect
-
   h2:
     console:
       enabled: true
       path: /h2-console
-
   servlet:
     multipart:
       max-file-size: 100MB
@@ -32,8 +28,14 @@ app:
     storage:
       upload-dir: ./uploads
       max-size: 104857600 # 100MB
+  analysis:
+    enhanced:
+      enabled: true
+      max-sections-per-document: 5
+      confidence-threshold: 0.7
+      detailed-analysis: true
 
 logging:
   level:
     com.adobe.hackathon: INFO
-    org.springframework.web: DEBUG
+    org.springframework.web: WARN  # Reduced logging

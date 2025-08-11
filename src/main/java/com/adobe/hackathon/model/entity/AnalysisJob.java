@@ -36,6 +36,24 @@ public class AnalysisJob {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    @Column(name = "analysis_type")
+    private String analysisType = "standard";
+
+    @Column(name = "sections_extracted")
+    private Integer sectionsExtracted;
+
+    @Column(name = "confidence_score")
+    private Double confidenceScore;
+
+    // Add getters and setters
+    public String getAnalysisType() { return analysisType; }
+    public void setAnalysisType(String analysisType) { this.analysisType = analysisType; }
+
+    public Integer getSectionsExtracted() { return sectionsExtracted; }
+    public void setSectionsExtracted(Integer sectionsExtracted) { this.sectionsExtracted = sectionsExtracted; }
+
+    public Double getConfidenceScore() { return confidenceScore; }
+    public void setConfidenceScore(Double confidenceScore) { this.confidenceScore = confidenceScore; }
 
     // Constructors
     public AnalysisJob() {
