@@ -26,7 +26,11 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "./mvnw clean package -DskipTests"
+args = "chmod +x mvnw"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./mvnw clean package -DskipTests -q"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
