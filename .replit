@@ -1,0 +1,37 @@
+modules = ["java-graalvm22.3", "python-3.12"]
+
+[nix]
+channel = "stable-25_05"
+
+[workflows]
+runButton = "Run Application"
+
+[[workflows.workflow]]
+name = "Build and Run Adobe Challenge"
+author = 46346002
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./mvnw clean compile"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./mvnw spring-boot:run -Dspring-boot.run.jvmArguments=\"-Dserver.address=0.0.0.0 -Dserver.port=8080\""
+
+[[workflows.workflow]]
+name = "Run Application"
+author = 46346002
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "chmod +x mvnw"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./mvnw clean package -DskipTests -q"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "java -Dserver.address=0.0.0.0 -Dserver.port=8080 -jar target/Adobe1B.jar"

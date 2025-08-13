@@ -22,6 +22,13 @@ spring:
 
 server:
   port: 8080
+  address: 0.0.0.0  # Bind to all interfaces for external access
+  servlet:
+    context-path: /
+  compression:
+    enabled: true  # Enable compression for better performance
+  http2:
+    enabled: true  # Enable HTTP/2 for Adobe PDF Embed API
 
 app:
   file:
@@ -40,9 +47,9 @@ app:
     max-pages: 500
 
     cors:
-      allowed-origins: "http://localhost:3000,http://localhost:8080"
-      allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
-      allowed-headers: "*"
+    allowed-origins: "http://localhost:3000,http://localhost:8080"
+    allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
+    allowed-headers: "*"
 
 llm:
   provider: gemini

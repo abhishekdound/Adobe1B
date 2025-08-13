@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -55,15 +57,17 @@ public class LLMIntegrationService {
 
         Map<String, Object> requestBody = new HashMap<>();
         Map<String, Object> contents = new HashMap<>();
-        Map<String, Object> parts = new HashMap<>();
-        parts.put("text", prompt);
-        contents.put("parts", new Object[]{parts});
+        List<Map<String, Object>> parts = new ArrayList<>();
+        Map<String, Object> textPart = new HashMap<>();
+        textPart.put("text", prompt);
+        parts.add(textPart);
+        contents.put("parts", parts);
         requestBody.put("contents", new Object[]{contents});
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
         try {
-            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.POST, entity, (Class<Map<String, Object>>) (Class<?>) Map.class);
 
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 return extractGeminiResponse(response.getBody());
@@ -94,7 +98,7 @@ public class LLMIntegrationService {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
         try {
-            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.POST, entity, (Class<Map<String, Object>>) (Class<?>) Map.class);
 
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 return extractOpenAIResponse(response.getBody());
@@ -110,25 +114,43 @@ public class LLMIntegrationService {
     @SuppressWarnings("unchecked")
     private String extractGeminiResponse(Map<String, Object> response) {
         try {
-            Map<String, Object> candidates = ((java.util.List<Map<String, Object>>) response.get("candidates")).get(0);
-            Map<String, Object> content = (Map<String, Object>) candidates.get("content");
-            Map<String, Object> parts = ((java.util.List<Map<String, Object>>) content.get("parts")).get(0);
-            return (String) parts.get("text");
+            List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.get("candidates");
+            if (candidates == null || candidates.isEmpty()) {
+                throw new RuntimeException("No candidates found in Gemini response");
+            }
+            Map<String, Object> firstCandidate = candidates.get(0);
+            Map<String, Object> content = (Map<String, Object>) firstCandidate.get("content");
+            if (content == null) {
+                 throw new RuntimeException("No content found in Gemini candidate");
+            }
+            List<Map<String, Object>> contentParts = (List<Map<String, Object>>) content.get("parts");
+             if (contentParts == null || contentParts.isEmpty()) {
+                throw new RuntimeException("No parts found in Gemini content");
+            }
+            Map<String, Object> firstPart = contentParts.get(0);
+            return (String) firstPart.get("text");
         } catch (Exception e) {
             logger.error("Error extracting Gemini response", e);
-            throw new RuntimeException("Failed to parse Gemini response");
+            throw new RuntimeException("Failed to parse Gemini response: " + e.getMessage());
         }
     }
 
     @SuppressWarnings("unchecked")
     private String extractOpenAIResponse(Map<String, Object> response) {
         try {
-            Map<String, Object> choices = ((java.util.List<Map<String, Object>>) response.get("choices")).get(0);
-            Map<String, Object> message = (Map<String, Object>) choices.get("message");
+            List<Map<String, Object>> choices = (List<Map<String, Object>>) response.get("choices");
+             if (choices == null || choices.isEmpty()) {
+                throw new RuntimeException("No choices found in OpenAI response");
+            }
+            Map<String, Object> firstChoice = choices.get(0);
+            Map<String, Object> message = (Map<String, Object>) firstChoice.get("message");
+             if (message == null) {
+                throw new RuntimeException("No message found in OpenAI choice");
+            }
             return (String) message.get("content");
         } catch (Exception e) {
             logger.error("Error extracting OpenAI response", e);
-            throw new RuntimeException("Failed to parse OpenAI response");
+            throw new RuntimeException("Failed to parse OpenAI response: " + e.getMessage());
         }
     }
 
