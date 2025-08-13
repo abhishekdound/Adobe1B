@@ -2,3 +2,19 @@ modules = ["java-graalvm22.3", "python-3.12"]
 
 [nix]
 channel = "stable-25_05"
+
+[workflows]
+runButton = "Build and Run Adobe Challenge"
+
+[[workflows.workflow]]
+name = "Build and Run Adobe Challenge"
+author = 46346002
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./mvnw clean compile"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./mvnw spring-boot:run -Dspring-boot.run.jvmArguments=\"-Dserver.address=0.0.0.0 -Dserver.port=8080\""
