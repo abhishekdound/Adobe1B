@@ -86,6 +86,7 @@ public class FrontendIntegrationController {
                     .stream()
                     .filter(section -> section.getRelevanceScore() > 0.8)
                     .sorted((a, b) -> Double.compare(b.getRelevanceScore(), a.getRelevanceScore()))
+                    .limit(3)
                     .collect(java.util.stream.Collectors.toList());
 
             response.put("success", true);
