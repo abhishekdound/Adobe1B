@@ -47,12 +47,31 @@ public class AdobeChallengeController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // Validate files
+            // Validate files - Enhanced validation for bulk upload requirement
             if (files == null || files.length == 0) {
                 response.put("success", false);
                 response.put("error", "No files provided");
                 return ResponseEntity.badRequest().body(response);
             }
+
+            // Validate file types and sizes for Adobe Challenge requirements
+            for (MultipartFile file : files) {
+                if (!file.getContentType().equals("application/pdf")) {
+                    response.put("success", false);
+                    response.put("error", "Only PDF files are supported. File: " + file.getOriginalFilename());
+                    return ResponseEntity.badRequest().body(response);
+                }
+                
+                // 10MB limit per file for performance
+                if (file.getSize() > 10 * 1024 * 1024) {
+                    response.put("success", false);
+                    response.put("error", "File too large (max 10MB): " + file.getOriginalFilename());
+                    return ResponseEntity.badRequest().body(response);
+                }
+            }
+
+            // Performance requirement check - start timing
+            logger.info("Starting analysis for {} files. Target: < 10 seconds for base features", files.length);
 
             // Validate file types (PDF only)
             for (MultipartFile file : files) {

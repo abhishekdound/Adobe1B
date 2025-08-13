@@ -42,5 +42,5 @@ ENV TTS_PROVIDER=azure
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8080/api/analysis/health || exit 1
 
-# Run the application
-CMD ["java", "-jar", "target/adobe-challenge-1b-1.0.0.jar"]
+# Run the application bound to 0.0.0.0 for external access
+CMD ["java", "-Dserver.address=0.0.0.0", "-Dserver.port=8080", "-jar", "target/adobe-challenge-1b-1.0.0.jar"]
