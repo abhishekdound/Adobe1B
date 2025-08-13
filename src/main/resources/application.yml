@@ -47,9 +47,9 @@ app:
     max-pages: 500
 
     cors:
-      allowed-origins: "http://localhost:3000,http://localhost:8080"
-      allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
-      allowed-headers: "*"
+    allowed-origins: "http://localhost:3000,http://localhost:8080"
+    allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
+    allowed-headers: "*"
 
 llm:
   provider: gemini
